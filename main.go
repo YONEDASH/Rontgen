@@ -4,11 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
-	"math"
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
+	"unicode"
 )
 
 type Match struct {
@@ -20,39 +19,94 @@ type Match struct {
 
 var Version string = "1.0"
 var ViewRange int = 10
+var AllowDuplicates bool = false
 
 func main() {
-	fmt.Printf("GrepClone v%s\n", Version)
+	flag.Usage = func() {
+		fmt.Printf("Usage: %s [-v] [-i] <file_path> <pattern>\n", os.Args[0])
+		fmt.Println("Flags:")
+		flag.PrintDefaults()
+		fmt.Println("Pattern:")
+		fmt.Printf("  <pattern>\tPattern to search for\n")
+	}
 
-	patternPtr := flag.String("p", "", "Pattern")
-	dirPathPtr := flag.String("d", "", "Path of directory")
+	versionPtr := flag.Bool("v", false, "Show version")
+	infoPtr := flag.Bool("i", false, "Show info for matches")
+	duplicatesPtr := flag.Bool("d", false, "Allow duplicate lines on multiple matches")
+
 	flag.Parse()
 
-	patternStr := *patternPtr
+	if *versionPtr {
+		fmt.Printf("GrepClone v%s\n", Version)
+		return
+	}
 
-	if len(patternStr) == 0 {
+	if *duplicatesPtr {
+		AllowDuplicates = true
+	}
+
+	nonFlagArgs := flag.Args()
+
+	if len(nonFlagArgs) == 0 {
 		fmt.Println("No pattern declared")
 		return
 	}
 
-	dirPath := *dirPathPtr
+	if len(nonFlagArgs) > 2 {
+		fmt.Println("Too many arguments")
+		return
+	}
 
-	if len(dirPath) == 0 {
-		dirPath = "."
+	patternStr := nonFlagArgs[0]
+
+	if len(patternStr) == 0 {
+		fmt.Println("Invalid pattern declared")
+		return
+	}
+
+	path := "."
+
+	if len(nonFlagArgs) == 2 {
+		path = nonFlagArgs[1]
 	}
 
 	matches := []Match{}
 
 	pattern, err := regexp.Compile(patternStr)
 	if err != nil {
-		fmt.Println("Error compiling regex: ", err)
+		fmt.Println("Error compiling regex:", err)
 		return
 	}
 
-	ScanDir(pattern, dirPath, &matches)
+	pathInfo, err := GetPath(path)
 
-	for _, match := range matches {
-		fmt.Printf("%s @ line %d, column %d: %s\n", match.Path, match.Row, match.Column, match.Line)
+	if err != nil {
+		fmt.Println("Error while checking path:", err)
+		return
+	}
+
+	if pathInfo.IsDir() {
+		ScanDir(pattern, path, &matches)
+	} else {
+		ScanFile(pathInfo.Name(), pattern, &matches)
+	}
+
+	if *infoPtr {
+		for _, match := range matches {
+			fmt.Printf("%s @ line %d, column %d: %s\n", match.Path, match.Row, match.Column, match.Line)
+		}
+	} else {
+		linesPrinted := []int{}
+
+		for _, match := range matches {
+			if !AllowDuplicates && ContainsInt(match.Row, linesPrinted) {
+				continue
+			}
+			linesPrinted = append(linesPrinted, match.Row)
+
+			fmt.Printf("%s\n", match.Line)
+		}
+
 	}
 
 	if len(matches) == 0 {
@@ -61,12 +115,30 @@ func main() {
 
 }
 
+func ContainsInt(target int, slice []int) bool {
+	for _, num := range slice {
+		if num == target {
+			return true
+		}
+	}
+	return false
+}
+
+func GetPath(path string) (fs.FileInfo, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return fileInfo, nil
+}
+
 func ScanDir(pattern *regexp.Regexp, path string, matches *[]Match) {
 	// Open dir
 	dirEntry, err := os.ReadDir(path)
 
 	if err != nil {
-		fmt.Println("Error opening directory: ", err)
+		fmt.Println("Error opening directory:", err)
 		return
 	}
 
@@ -78,15 +150,20 @@ func ScanDir(pattern *regexp.Regexp, path string, matches *[]Match) {
 			continue
 		}
 
-		ScanFile(entryPath, entry, pattern, matches)
+		ScanFile(entryPath, pattern, matches)
 	}
 }
 
-func ScanFile(entryPath string, entry fs.DirEntry, pattern *regexp.Regexp, matches *[]Match) {
+func ScanFile(entryPath string, pattern *regexp.Regexp, matches *[]Match) {
 	fileContent, err := os.ReadFile(entryPath)
 
 	if err != nil {
-		fmt.Println("Error reading file: ", err)
+		fmt.Println("Error reading file:", err)
+		return
+	}
+
+	if IsBinary(fileContent) {
+		fmt.Printf("%s is a binary\n", entryPath)
 		return
 	}
 
@@ -108,16 +185,23 @@ func ScanFile(entryPath string, entry fs.DirEntry, pattern *regexp.Regexp, match
 	}
 
 	for _, loc := range locations {
-		startIndex, endIndex := loc[0], loc[1]
+		startIndex := loc[0]
 
 		lineIndex, row := GetLineIndex(startIndex, newLineIndexes)
 
 		col := startIndex - lineIndex
 
-		viewStart := int(math.Max(0, float64(startIndex-ViewRange)))
-		viewEnd := int(math.Min(float64(contentLength), float64(endIndex+ViewRange)))
+		viewStart := lineIndex + 1
+		if row == 0 {
+			viewStart = 0
+		}
 
-		line := ".." + CleanUpLine(contentString[viewStart:viewEnd]) + ".."
+		viewEnd := contentLength
+		if row < len(newLineIndexes) {
+			viewEnd = newLineIndexes[row]
+		}
+
+		line := contentString[viewStart:viewEnd]
 
 		match := Match{
 			Path:   entryPath,
@@ -130,23 +214,30 @@ func ScanFile(entryPath string, entry fs.DirEntry, pattern *regexp.Regexp, match
 	}
 }
 
+func IsBinary(data []byte) bool {
+	for _, b := range data {
+		if b == 0 {
+			return true
+		}
+		if !unicode.IsPrint(rune(b)) && !unicode.IsSpace(rune(b)) {
+			return true
+		}
+	}
+	return false
+}
+
 func GetLineIndex(where int, lineIndexes []int) (int, int) {
 	index := 0
 	inArray := 0
 
 	for _, lineIndex := range lineIndexes {
-		inArray++
 		if lineIndex < where {
 			index = lineIndex
 		} else {
 			break
 		}
+		inArray++
 	}
 
 	return index, inArray
-}
-
-// Remove new lines and tabs
-func CleanUpLine(str string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(str, "\n", " "), "\t", " ")
 }
