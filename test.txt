@@ -1,0 +1,6 @@
+Hello this is an example file.
+I use this file to test my grep clone.
+
+Hellothisis. Hello!
+
+ok Ok
