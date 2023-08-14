@@ -45,7 +45,7 @@ type Configuration struct {
 }
 ```
 
-Now you can finally run the ``Rontgen`` function. It returns a array of Match structs:
+Now you can finally run the ``Rontgen`` function. It returns an array of Match structs:
 
 ```go
 type Match struct {
