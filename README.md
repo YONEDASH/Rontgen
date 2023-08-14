@@ -1,13 +1,12 @@
-# GrepClone
+# Rontgen
 
 A(nother) very basic grep clone written in Go.
 
 ```
-Usage: ./grepclone [-v] [-i] <file_path> <pattern>
+Usage: ./rontgen [-v] [-verbose] <path> <pattern>
 Flags:
-  -d	Allow duplicate lines on multiple matches
-  -i	Show info for matches
-  -v	Show version
-Pattern:
-  <pattern>	Pattern to search for
+  -v         Show version
+  -verbose   Verbose
+  <path>     Path to directory or file
+  <pattern>  Pattern to search for
 ```
