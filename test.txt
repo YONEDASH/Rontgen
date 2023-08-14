@@ -4,3 +4,5 @@ I use this file to test my grep clone.
 Hellothisis. Hello!
 
 ok Ok
+
+This is a test!
