@@ -19,12 +19,13 @@ type Configuration struct {
 }
 
 type Match struct {
-	Path    string
-	Row     int
-	Column  int
-	Length  int
-	Matched string
-	Line    string
+	Path      string
+	NameMatch bool
+	Row       int
+	Column    int
+	Length    int
+	Matched   string
+	Line      string
 }
 
 func Rontgen(config *Configuration) []Match {
@@ -33,7 +34,7 @@ func Rontgen(config *Configuration) []Match {
 	isRootDir, err := isDir(config.Path)
 
 	if err != nil {
-		fmt.Println("Error while determining root type:", err)
+		fmt.Println(Red, "\bError while determining root type:", err, Reset)
 		return matches
 	}
 
@@ -58,7 +59,7 @@ func scanDir(path string, config *Configuration, matches *[]Match) {
 	dirEntry, err := os.ReadDir(path)
 
 	if err != nil {
-		fmt.Println("Error opening directory:", err)
+		fmt.Println(Red, "\bError opening directory:", err, Reset)
 		return
 	}
 
@@ -75,10 +76,20 @@ func scanDir(path string, config *Configuration, matches *[]Match) {
 }
 
 func scanFile(path string, config *Configuration, matches *[]Match) {
+	// Check if pattern matches file name
+	if config.Pattern.MatchString(path) {
+		match := Match{
+			Path:      path,
+			NameMatch: true,
+		}
+		*matches = append(*matches, match)
+	}
+
+	// Check if pattern matches file content
 	content, err := os.ReadFile(path)
 
 	if err != nil {
-		fmt.Println("Error reading file:", err)
+		fmt.Println(Red, "\bError reading file:", err, Reset)
 		return
 	}
 
@@ -133,12 +144,13 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 		matched := text[startIndex:endIndex]
 
 		match := Match{
-			Path:    path,
-			Row:     row,
-			Column:  column,
-			Length:  matchLen,
-			Matched: matched,
-			Line:    line,
+			Path:      path,
+			NameMatch: false,
+			Row:       row,
+			Column:    column,
+			Length:    matchLen,
+			Matched:   matched,
+			Line:      line,
 		}
 
 		*matches = append(*matches, match)

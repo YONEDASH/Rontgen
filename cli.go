@@ -34,9 +34,35 @@ func main() {
 			currentPath = match.Path
 		}
 
-		fmt.Printf("%s %d:%d\n", match.Path, match.Row, match.Column)
-		fmt.Printf("%s\n", match.Line)
+		if match.NameMatch {
+			fmt.Print(Red, Bold)
+			fmt.Printf("%s\n", match.Path)
+			PrintReset()
+			fmt.Println("(filename)")
+			PrintReset()
+		} else {
+			fmt.Print(Green, Italic)
+			fmt.Printf("%s ", match.Path)
+			PrintReset()
+			fmt.Print(Yellow)
+			fmt.Printf("%d:%d\n", match.Row, match.Column)
+			PrintReset()
+			printMatchedLine(match)
+			//fmt.Printf("%s\n", match.Line)
+		}
+
 	}
+}
+
+func printMatchedLine(match Match) {
+	left := match.Line[0 : match.Column-1]
+	right := match.Line[match.Column+match.Length-1 : len(match.Line)]
+
+	PrintReset()
+	fmt.Print(left)
+	fmt.Print(Red, Bold, match.Matched)
+	PrintReset()
+	fmt.Println(right)
 }
 
 func handleFlags() *Configuration {
@@ -61,14 +87,14 @@ func handleFlags() *Configuration {
 	}
 
 	if argCount > 2 {
-		fmt.Println("Invalid argument count")
+		fmt.Println(Red, "\bInvalid argument count", Reset)
 		return nil
 	}
 
 	pattern, err := regexp.Compile(args[0])
 
 	if err != nil {
-		fmt.Println("Could not compile pattern:", err)
+		fmt.Println(Red, "\bCould not compile pattern:", err, Reset)
 		return nil
 	}
 
@@ -91,8 +117,8 @@ func printHelp() {
 	fmt.Printf("Usage: %s [-v] [-verbose] <path> <pattern>\n", os.Args[0])
 	fmt.Println("Flags:")
 	flag.PrintDefaults()
-	fmt.Println("  <path>\tPath to directory or file")
-	fmt.Println("  <pattern>\tPattern to search for")
+	fmt.Println("  <path> Path to directory or file")
+	fmt.Println("  <pattern> Pattern to search for")
 }
 
 func printVersion() {
