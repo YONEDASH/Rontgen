@@ -84,6 +84,7 @@ func handleFlags() (*Configuration, bool) {
 	verboseFlag := flag.Bool("verbose", false, "Verbose")
 	versionFlag := flag.Bool("v", false, "Show version")
 	depthCapFlag := flag.Int("dc", 10, "Maximum directory depth")
+	sizeCapFlag := flag.Int64("fs", 20_000, "Maximum file size in kilobytes") // 20 MB by default
 
 	flag.Parse()
 
@@ -95,6 +96,13 @@ func handleFlags() (*Configuration, bool) {
 	if *depthCapFlag <= 0 {
 		fmt.Print(Red)
 		fmt.Print("Directory depth cap needs to be bigger than zero")
+		fmt.Println(Reset)
+		return nil, true
+	}
+
+	if *sizeCapFlag <= 0 {
+		fmt.Print(Red)
+		fmt.Print("File size cap needs to be bigger than zero")
 		fmt.Println(Reset)
 		return nil, true
 	}
@@ -130,6 +138,7 @@ func handleFlags() (*Configuration, bool) {
 		Path:     path,
 		Pattern:  pattern,
 		DepthCap: *depthCapFlag,
+		SizeCap:  *sizeCapFlag * 1_000, // converts KB to bytes
 	}
 
 	return &config, false

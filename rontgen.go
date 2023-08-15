@@ -15,6 +15,7 @@ type Configuration struct {
 	Path     string
 	Pattern  *regexp.Regexp
 	DepthCap int
+	SizeCap  int64
 }
 
 type Match struct {
@@ -57,7 +58,7 @@ func isDir(path string) (bool, error) {
 func scanDir(path string, config *Configuration, matches *[]Match, depth int) {
 	if depth > config.DepthCap {
 		if config.Verbose {
-			fmt.Println("Reached depth cap of", config.DepthCap)
+			fmt.Println(path, "reached depth cap of", config.DepthCap)
 		}
 
 		return
@@ -94,6 +95,19 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 			Length:    nameLocation[1] - nameLocation[0],
 		}
 		*matches = append(*matches, match)
+	}
+
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return
+	}
+
+	if fileInfo.Size() > config.SizeCap {
+		if config.Verbose {
+			fmt.Println(path, "reached size cap of", config.DepthCap)
+		}
+
+		return
 	}
 
 	// Check if pattern matches file content
