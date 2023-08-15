@@ -8,9 +8,7 @@ import (
 	"unicode"
 )
 
-const (
-	Version = "1.0"
-)
+var Version = "dev"
 
 type Configuration struct {
 	Verbose bool
