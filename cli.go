@@ -8,10 +8,13 @@ import (
 )
 
 func main() {
-	config := handleFlags()
+	config, errorCode := handleFlags()
 
 	if config == nil {
-		os.Exit(1)
+		if errorCode {
+			os.Exit(1)
+		}
+
 		return
 	}
 
@@ -75,7 +78,7 @@ func printMatchedPath(match Match) {
 	fmt.Println(right)
 }
 
-func handleFlags() *Configuration {
+func handleFlags() (*Configuration, bool) {
 	flag.Usage = printHelp
 
 	verboseFlag := flag.Bool("verbose", false, "Verbose")
@@ -85,7 +88,7 @@ func handleFlags() *Configuration {
 
 	if *versionFlag {
 		printVersion()
-		return nil
+		return nil, false
 	}
 
 	args := flag.Args()
@@ -93,19 +96,19 @@ func handleFlags() *Configuration {
 
 	if argCount == 0 {
 		printHelp()
-		return nil
+		return nil, false
 	}
 
 	if argCount > 2 {
 		fmt.Println(Red, "\bInvalid argument count", Reset)
-		return nil
+		return nil, true
 	}
 
 	pattern, err := regexp.Compile(args[0])
 
 	if err != nil {
 		fmt.Println(Red, "\bCould not compile pattern:", err, Reset)
-		return nil
+		return nil, true
 	}
 
 	path := "."
@@ -120,7 +123,7 @@ func handleFlags() *Configuration {
 		Pattern: pattern,
 	}
 
-	return &config
+	return &config, false
 }
 
 func printHelp() {
@@ -132,5 +135,7 @@ func printHelp() {
 }
 
 func printVersion() {
-	fmt.Printf("Rontgen v%s\n", Version)
+	fmt.Print(Green)
+	fmt.Printf("Rontgen version %s\n", Version)
+	PrintReset()
 }
