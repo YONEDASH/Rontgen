@@ -1,4 +1,4 @@
-# Rontgen (rtg)
+# Rontgen (rn)
 
 Recursively find matches for a given regex pattern in file names or plain text file content.
 
@@ -7,7 +7,7 @@ Recursively find matches for a given regex pattern in file names or plain text f
 By default, Rontgen will search through the current working directory. You can specify a path of a file or directory.
 
 ```
-Usage: ./rtg [-v] [-i] <pattern> <path>
+Usage: rn [-v] [-i] <pattern> <path>
 Flags:
  -v Show version
  -verbose Verbose
@@ -16,9 +16,21 @@ Pattern:
  <pattern> Pattern to search for
 ```
 
-## Building
+## Installation
 
-To build the project you need to have the Go language and Git installed on your device.
+To simply install Rontgen using Homebrew execute the following commands:
+
+```zsh
+brew tap yonedash/formulae
+
+brew install rontgen
+```
+
+Otherwise you can build it yourself.
+
+## Building it yourself
+
+To build the project yourself you need to have the Go language and Git installed on your device.
 
 Run the following commands:
 ```zsh
@@ -29,7 +41,7 @@ cd Rontgen
 chmod +x build.sh && ./build.sh
 ```
 
-Once you are done the binary called ``rtg`` was created.
+Once you are done the binary called ``rn`` was created.
 
 ## API
 
@@ -77,6 +89,6 @@ If a file name was matched the following fields will be set:
 ## Todos
 
 - Make the ``Rontgen`` function also return errors (maybe with severity?)
-- Replace (example: rtg <pattern> -r ...)
+- Replace (example: rn <pattern> -r ...)
 - Maximum directory depth, depth cap (-dc ...)
 - Max file count to search through, file cap (-fc ...)

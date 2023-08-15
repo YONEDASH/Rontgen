@@ -8,7 +8,7 @@ builds:
     goos:
       - linux
       - darwin
-    binary: rtg
+    binary: rn
     ldflags:
       - -w -X "main.Version={{ .Version }}"
 
