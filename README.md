@@ -76,5 +76,7 @@ If a file name was matched the following fields will be set:
 
 ## Todos
 
-- Make the ``Rontgen`` function also return errors
-- Replace function
+- Make the ``Rontgen`` function also return errors (maybe with severity?)
+- Replace (example: rtg <pattern> -r ...)
+- Maximum directory depth, depth cap (-dc ...)
+- Max file count to search through, file cap (-fc ...)
