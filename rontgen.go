@@ -77,10 +77,14 @@ func scanDir(path string, config *Configuration, matches *[]Match) {
 
 func scanFile(path string, config *Configuration, matches *[]Match) {
 	// Check if pattern matches file name
-	if config.Pattern.MatchString(path) {
+	nameLocation := config.Pattern.FindStringIndex(path)
+	if len(nameLocation) > 0 {
 		match := Match{
 			Path:      path,
 			NameMatch: true,
+			Matched:   path[nameLocation[0]:nameLocation[1]],
+			Column:    nameLocation[0],
+			Length:    nameLocation[1] - nameLocation[0],
 		}
 		*matches = append(*matches, match)
 	}

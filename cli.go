@@ -35,8 +35,7 @@ func main() {
 		}
 
 		if match.NameMatch {
-			fmt.Print(Red, Bold)
-			fmt.Printf("%s\n", match.Path)
+			printMatchedPath(match)
 			PrintReset()
 			fmt.Println("(filename)")
 			PrintReset()
@@ -57,6 +56,17 @@ func main() {
 func printMatchedLine(match Match) {
 	left := match.Line[0 : match.Column-1]
 	right := match.Line[match.Column+match.Length-1 : len(match.Line)]
+
+	PrintReset()
+	fmt.Print(left)
+	fmt.Print(Red, Bold, match.Matched)
+	PrintReset()
+	fmt.Println(right)
+}
+
+func printMatchedPath(match Match) {
+	left := match.Path[0:match.Column]
+	right := match.Path[match.Column+match.Length : len(match.Path)]
 
 	PrintReset()
 	fmt.Print(left)
