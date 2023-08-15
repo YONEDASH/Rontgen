@@ -30,3 +30,11 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+brews:
+  -
+    name: rontgen
+    homepage: https://github.com/yonedash/Rontgen
+    repository:
+      owner: yonedash
+      name: formulae
