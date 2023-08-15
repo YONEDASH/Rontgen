@@ -4,7 +4,7 @@ Recursively find matches for a given regex pattern in file names or plain text f
 
 ## Usage
 
-By default, Rontgen will search through the current working directory. You can specify a path to a file or directory.
+By default, Rontgen will search through the current working directory. You can specify a path of a file or directory.
 
 ```
 Usage: ./rtg [-v] [-i] <pattern> <path>
@@ -29,13 +29,13 @@ cd Rontgen
 chmod +x build.sh && ./build.sh
 ```
 
-When you are done the binary called ``rtg`` was created.
+Once you are done the binary called ``rtg`` was created.
 
 ## API
 
 You can simply call the ``Rontgen`` function. 
 
-Its only parameter is a ``Configuration`` struct. ``Path`` should direct to a existing file or directory. Set ``Pattern`` as your desired (and compiled) Regex pattern. The struct looks like this:
+Its only parameter is a ``Configuration`` struct. Set ``Path`` as the path of an existing file or directory. Set ``Pattern`` as your desired (and compiled) Regex pattern. The struct looks like this:
 
 ```go
 type Configuration struct {
@@ -59,7 +59,7 @@ type Match struct {
 }
 ```
 
-``Path`` is always the path to the matched file.
+``Path`` is always the path of the matched file.
 ``NameMatch`` determines whether the file name was matched (``true``) or the file's content was matched (``false``).
 
 If file content was matched the following fields will be set:
