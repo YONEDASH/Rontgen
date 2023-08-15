@@ -139,3 +139,7 @@ func printVersion() {
 	fmt.Printf("Rontgen version %s\n", Version)
 	PrintReset()
 }
+
+func PrintReset() {
+	fmt.Print(Reset)
+}

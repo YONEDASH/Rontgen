@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type ANSI string
 
 const (
@@ -34,7 +32,3 @@ const (
 	Concealed     ANSI = "\033[8m"
 	Blink         ANSI = "\033[5m"
 )
-
-func PrintReset() {
-	fmt.Print(Reset)
-}
