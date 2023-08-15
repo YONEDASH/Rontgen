@@ -18,11 +18,12 @@ Pattern:
 
 ## Installation
 
-To simply install Rontgen using Homebrew execute the following commands:
+To simply install using Homebrew execute the following commands:
 
 ```zsh
 brew tap yonedash/homebrew-formulae
-
+```
+```zsh
 brew install rontgen
 ```
 
@@ -35,9 +36,11 @@ To build the project yourself you need to have the Go language and Git installed
 Run the following commands:
 ```zsh
 git clone https://github.com/YONEDASH/Rontgen.git
-
+```
+```zsh
 cd Rontgen
-
+```
+```zsh
 chmod +x build.sh && ./build.sh
 ```
 
