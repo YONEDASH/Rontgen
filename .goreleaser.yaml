@@ -37,4 +37,4 @@ brews:
     homepage: https://github.com/yonedash/Rontgen
     repository:
       owner: yonedash
-      name: formulae
+      name: homebrew-formulae

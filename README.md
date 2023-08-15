@@ -21,7 +21,7 @@ Pattern:
 To simply install Rontgen using Homebrew execute the following commands:
 
 ```zsh
-brew tap yonedash/formulae
+brew tap yonedash/homebrew-formulae
 
 brew install rontgen
 ```
