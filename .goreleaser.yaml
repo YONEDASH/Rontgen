@@ -9,6 +9,8 @@ builds:
       - linux
       - darwin
     binary: rtg
+    ldflags:
+      - -w -X "main.Version={{ .Version }}"
 
 archives:
   - name_template: >-
