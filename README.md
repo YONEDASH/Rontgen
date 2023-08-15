@@ -62,13 +62,19 @@ type Match struct {
 ``Path`` is always the path to the matched file.
 ``NameMatch`` determines whether the file name was matched (``true``) or the file's content was matched (``false``).
 
-If file content was matched following fields will be set:
+If file content was matched the following fields will be set:
 - ``Row`` (line) and ``Column`` of the matched text.
 - ``Length`` of the matched text.
 - ``Matched`` as the matched text itself.
 - ``Line`` as the entire line where the text was matched.
 
+If a file name was matched the following fields will be set:
+- ``Column`` (index) of the matched name.
+- ``Length`` of the matched name.
+- ``Matched`` as the matched name itself.
+
 
 ## Todos
 
 - Make the ``Rontgen`` function also return errors
+- Replace function
