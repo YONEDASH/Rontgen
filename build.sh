@@ -1,1 +1,2 @@
-go build -ldflags="-w" -o="rtg"
+# Deprecated
+go build -ldflags="-w -X 'main.Version=1.0'" -o="rtg"
