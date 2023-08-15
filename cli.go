@@ -83,12 +83,20 @@ func handleFlags() (*Configuration, bool) {
 
 	verboseFlag := flag.Bool("verbose", false, "Verbose")
 	versionFlag := flag.Bool("v", false, "Show version")
+	depthCapFlag := flag.Int("dc", 10, "Maximum directory depth")
 
 	flag.Parse()
 
 	if *versionFlag {
 		printVersion()
 		return nil, false
+	}
+
+	if *depthCapFlag <= 0 {
+		fmt.Print(Red)
+		fmt.Print("Directory depth cap needs to be bigger than zero")
+		fmt.Println(Reset)
+		return nil, true
 	}
 
 	args := flag.Args()
@@ -118,9 +126,10 @@ func handleFlags() (*Configuration, bool) {
 	}
 
 	config := Configuration{
-		Verbose: *verboseFlag,
-		Path:    path,
-		Pattern: pattern,
+		Verbose:  *verboseFlag,
+		Path:     path,
+		Pattern:  pattern,
+		DepthCap: *depthCapFlag,
 	}
 
 	return &config, false

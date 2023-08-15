@@ -11,9 +11,10 @@ import (
 var Version = "dev"
 
 type Configuration struct {
-	Verbose bool
-	Path    string
-	Pattern *regexp.Regexp
+	Verbose  bool
+	Path     string
+	Pattern  *regexp.Regexp
+	DepthCap int
 }
 
 type Match struct {
@@ -37,7 +38,7 @@ func Rontgen(config *Configuration) []Match {
 	}
 
 	if isRootDir {
-		scanDir(config.Path, config, &matches)
+		scanDir(config.Path, config, &matches, 0)
 	} else {
 		scanFile(config.Path, config, &matches)
 	}
@@ -53,7 +54,15 @@ func isDir(path string) (bool, error) {
 	return fileInfo.IsDir(), nil
 }
 
-func scanDir(path string, config *Configuration, matches *[]Match) {
+func scanDir(path string, config *Configuration, matches *[]Match, depth int) {
+	if depth > config.DepthCap {
+		if config.Verbose {
+			fmt.Println("Reached depth cap of", config.DepthCap)
+		}
+
+		return
+	}
+
 	dirEntry, err := os.ReadDir(path)
 
 	if err != nil {
@@ -65,7 +74,7 @@ func scanDir(path string, config *Configuration, matches *[]Match) {
 		entryPath := filepath.Join(path, entry.Name())
 
 		if entry.IsDir() {
-			scanDir(entryPath, config, matches)
+			scanDir(entryPath, config, matches, depth+1)
 			continue
 		}
 

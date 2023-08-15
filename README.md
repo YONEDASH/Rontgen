@@ -9,11 +9,13 @@ By default, Rontgen will search through the current working directory. You can s
 ```
 Usage: rn [-v] [-i] <pattern> <path>
 Flags:
- -v Show version
- -verbose Verbose
-Pattern:
- <path> Path to directory or file
- <pattern> Pattern to search for
+  -dc int
+        Maximum directory depth (default 10)
+  -v    Show version
+  -verbose
+        Verbose
+  <path> Path to directory or file
+  <pattern> Pattern to search for
 ```
 
 ## Installation
@@ -93,5 +95,5 @@ If a file name was matched the following fields will be set:
 
 - Make the ``Rontgen`` function also return errors (maybe with severity?)
 - Replace (example: rn <pattern> -r ...)
-- Maximum directory depth, depth cap (-dc ...)
+- ~~Maximum directory depth, depth cap (-dc ...)~~
 - Max file count to search through, file cap (-fc ...)
