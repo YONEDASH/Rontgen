@@ -75,7 +75,7 @@ type Configuration struct {
 }
 ```
 
-Now you can finally run the ``Rontgen`` function. It returns an array of Match structs:
+Now you can finally run the ``Rontgen`` function. It returns an error (``nil`` if there is none) and an array of Match structs:
 
 ```go
 type Match struct {
@@ -106,7 +106,7 @@ If a file name was matched the following fields will be set:
 
 ## Todos
 
-- Make the ``Rontgen`` function also return errors (maybe with severity?)
+- ~~Make the ``Rontgen`` function also return errors~~ (maybe with severity?)
 - Replace (example: rn <pattern> -r ...)
 - ~~Maximum directory depth, depth cap (-dc ...)~~
 - ~~Max file count to search through, file cap (-fc ...)~~
