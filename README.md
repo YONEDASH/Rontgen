@@ -17,6 +17,7 @@ Flags:
         Maximum file size in kilobytes (default 20000)
   -mc int
         Maximum matches per file (default 1000)
+  -n    No colors
   -v    Show version
   -verbose
         Verbose

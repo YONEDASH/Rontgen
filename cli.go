@@ -39,16 +39,16 @@ func main() {
 
 		if match.NameMatch {
 			printMatchedPath(match)
-			PrintReset()
+			Ansi(Reset)
 			fmt.Println("(filename)")
-			PrintReset()
+			Ansi(Reset)
 		} else {
-			fmt.Print(Green, Italic)
+			Ansi(Green, Italic)
 			fmt.Printf("%s ", match.Path)
-			PrintReset()
-			fmt.Print(Yellow)
+			Ansi(Reset)
+			Ansi(Yellow)
 			fmt.Printf("%d:%d\n", match.Row, match.Column)
-			PrintReset()
+			Ansi(Reset)
 			printMatchedLine(match)
 			//fmt.Printf("%s\n", match.Line)
 		}
@@ -65,10 +65,11 @@ func printMatchedLine(match Match) {
 	left := match.Line[0:col]
 	right := match.Line[col+match.Length : len(match.Line)]
 
-	PrintReset()
+	Ansi(Reset)
 	fmt.Print(left)
-	fmt.Print(Red, Bold, match.Matched)
-	PrintReset()
+	Ansi(Red, Bold)
+	fmt.Print(match.Matched)
+	Ansi(Reset)
 	fmt.Println(right)
 }
 
@@ -76,10 +77,11 @@ func printMatchedPath(match Match) {
 	left := match.Path[0:match.Column]
 	right := match.Path[match.Column+match.Length : len(match.Path)]
 
-	PrintReset()
+	Ansi(Reset)
 	fmt.Print(left)
-	fmt.Print(Red, Bold, match.Matched)
-	PrintReset()
+	Ansi(Red, Bold)
+	fmt.Print(match.Matched)
+	Ansi(Reset)
 	fmt.Println(right)
 }
 
@@ -88,6 +90,7 @@ func handleFlags() (*Configuration, bool) {
 
 	verboseFlag := flag.Bool("verbose", false, "Verbose")
 	versionFlag := flag.Bool("v", false, "Show version")
+	noAnsiFlag := flag.Bool("n", false, "No colors")
 	depthCapFlag := flag.Int("dc", 10, "Maximum directory depth")
 	sizeCapFlag := flag.Int64("fs", 20_000, "Maximum file size in kilobytes") // 20 MB by default
 	countCapFlag := flag.Int("fc", 100_000, "Maximum file count")
@@ -95,36 +98,38 @@ func handleFlags() (*Configuration, bool) {
 
 	flag.Parse()
 
+	setAnsiEnabled(!*noAnsiFlag)
+
 	if *versionFlag {
 		printVersion()
 		return nil, false
 	}
 
 	if *depthCapFlag < 0 {
-		fmt.Print(Red)
-		fmt.Print("Directory depth cap needs to be bigger or equal to zero")
-		fmt.Println(Reset)
+		Ansi(Red)
+		fmt.Println("Directory depth cap needs to be bigger or equal to zero")
+		Ansi(Reset)
 		return nil, true
 	}
 
 	if *sizeCapFlag <= 0 {
-		fmt.Print(Red)
-		fmt.Print("File size cap needs to be bigger than zero")
-		fmt.Println(Reset)
+		Ansi(Reset)
+		fmt.Println("File size cap needs to be bigger than zero")
+		Ansi(Reset)
 		return nil, true
 	}
 
 	if *countCapFlag <= 0 {
-		fmt.Print(Red)
-		fmt.Print("File count cap needs to be bigger than zero")
-		fmt.Println(Reset)
+		Ansi(Red)
+		fmt.Println("File count cap needs to be bigger than zero")
+		Ansi(Reset)
 		return nil, true
 	}
 
 	if *matchCapFlag <= 0 {
-		fmt.Print(Red)
-		fmt.Print("Match cap needs to be bigger than zero")
-		fmt.Println(Reset)
+		Ansi(Red)
+		fmt.Println("Match cap needs to be bigger than zero")
+		Ansi(Reset)
 		return nil, true
 	}
 
@@ -176,11 +181,7 @@ func printHelp() {
 }
 
 func printVersion() {
-	fmt.Print(Green)
+	Ansi(Green)
 	fmt.Printf("Rontgen version %s\n", Version)
-	PrintReset()
-}
-
-func PrintReset() {
-	fmt.Print(Reset)
+	Ansi(Reset)
 }
