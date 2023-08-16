@@ -1,13 +1,15 @@
-package main
+package cli
 
 import (
 	"flag"
 	"fmt"
 	"os"
 	"regexp"
+
+	"github.com/yonedash/rontgen/rontgen"
 )
 
-func main() {
+func Run() {
 	config, errorCode := handleFlags()
 
 	if config == nil {
@@ -18,7 +20,7 @@ func main() {
 		return
 	}
 
-	matches, err := Rontgen(config)
+	matches, err := rontgen.Rontgen(config)
 
 	if err != nil {
 		Ansi(Red)
@@ -62,7 +64,7 @@ func main() {
 	}
 }
 
-func printMatchedLine(match Match) {
+func printMatchedLine(match rontgen.Match) {
 	col := match.Column - 1
 	if col < 0 {
 		col = 0
@@ -79,7 +81,7 @@ func printMatchedLine(match Match) {
 	fmt.Println(right)
 }
 
-func printMatchedPath(match Match) {
+func printMatchedPath(match rontgen.Match) {
 	left := match.Path[0:match.Column]
 	right := match.Path[match.Column+match.Length : len(match.Path)]
 
@@ -91,7 +93,7 @@ func printMatchedPath(match Match) {
 	fmt.Println(right)
 }
 
-func handleFlags() (*Configuration, bool) {
+func handleFlags() (*rontgen.Configuration, bool) {
 	flag.Usage = printHelp
 
 	verboseFlag := flag.Bool("verbose", false, "Verbose")
@@ -165,7 +167,7 @@ func handleFlags() (*Configuration, bool) {
 		path = args[1]
 	}
 
-	config := Configuration{
+	config := rontgen.Configuration{
 		Verbose:  *verboseFlag,
 		Path:     path,
 		Pattern:  pattern,
@@ -188,6 +190,6 @@ func printHelp() {
 
 func printVersion() {
 	Ansi(Green)
-	fmt.Printf("Rontgen version %s\n", Version)
+	fmt.Printf("Rontgen version %s\n", rontgen.Version)
 	Ansi(Reset)
 }
