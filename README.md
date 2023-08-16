@@ -75,7 +75,7 @@ type Configuration struct {
 }
 ```
 
-Now you can finally run the ``Rontgen`` function. It returns an error (``nil`` if there is none) and an array of Match structs:
+Now you can finally run the ``Rontgen`` function. It returns an array of Match structs and an error (``nil`` if there is none).
 
 ```go
 type Match struct {
