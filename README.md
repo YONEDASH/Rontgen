@@ -64,9 +64,13 @@ Its only parameter is a ``Configuration`` struct. Set ``Path`` as the path of an
 
 ```go
 type Configuration struct {
-	Verbose bool
-	Path    string
-	Pattern *regexp.Regexp
+	Verbose  bool
+	Path     string
+	Pattern  *regexp.Regexp
+	DepthCap int
+	SizeCap  int64
+	CountCap int
+	MatchCap int
 }
 ```
 
