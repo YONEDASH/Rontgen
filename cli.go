@@ -18,7 +18,13 @@ func main() {
 		return
 	}
 
-	matches := Rontgen(config)
+	matches, err := Rontgen(config)
+
+	if err != nil {
+		Ansi(Red)
+		fmt.Println(err)
+		Ansi(Reset)
+	}
 
 	if len(matches) == 0 {
 		return

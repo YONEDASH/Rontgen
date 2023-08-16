@@ -30,26 +30,33 @@ type Match struct {
 	Line      string
 }
 
-func Rontgen(config *Configuration) []Match {
+func Rontgen(config *Configuration) ([]Match, error) {
 	matches := []Match{}
 
 	isRootDir, err := isDir(config.Path)
 
 	if err != nil {
-		fmt.Println(Red, "\bError while determining root type:", err, Reset)
-		return matches
+		return matches, err
 	}
 
 	fileCount := 0
 
 	if isRootDir {
-		scanDir(config.Path, config, &matches, &fileCount, 0)
+		err := scanDir(config.Path, config, &matches, &fileCount, 0)
+
+		if err != nil {
+			return matches, nil
+		}
 	} else {
-		scanFile(config.Path, config, &matches)
+		err := scanFile(config.Path, config, &matches)
 		fileCount = 1
+
+		if err != nil {
+			return matches, nil
+		}
 	}
 
-	return matches
+	return matches, nil
 }
 
 func isDir(path string) (bool, error) {
@@ -60,20 +67,19 @@ func isDir(path string) (bool, error) {
 	return fileInfo.IsDir(), nil
 }
 
-func scanDir(path string, config *Configuration, matches *[]Match, fileCount *int, depth int) {
+func scanDir(path string, config *Configuration, matches *[]Match, fileCount *int, depth int) error {
 	if depth > config.DepthCap {
 		if config.Verbose {
 			fmt.Println(path, "reached depth cap of", config.DepthCap)
 		}
 
-		return
+		return nil
 	}
 
 	dirEntry, err := os.ReadDir(path)
 
 	if err != nil {
-		fmt.Println(Red, "\bError opening directory:", err, Reset)
-		return
+		return err
 	}
 
 	for _, entry := range dirEntry {
@@ -89,15 +95,17 @@ func scanDir(path string, config *Configuration, matches *[]Match, fileCount *in
 				fmt.Println(path, "reached file cap of", config.CountCap)
 			}
 
-			return
+			return nil
 		}
 
 		scanFile(entryPath, config, matches)
 		*fileCount++
 	}
+
+	return nil
 }
 
-func scanFile(path string, config *Configuration, matches *[]Match) {
+func scanFile(path string, config *Configuration, matches *[]Match) error {
 	// Check if pattern matches file name
 	nameLocation := config.Pattern.FindStringIndex(path)
 	if len(nameLocation) > 0 {
@@ -113,7 +121,7 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		return
+		return err
 	}
 
 	if fileInfo.Size() > config.SizeCap {
@@ -121,15 +129,14 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 			fmt.Println(path, "reached size cap of", config.DepthCap)
 		}
 
-		return
+		return nil
 	}
 
 	// Check if pattern matches file content
 	content, err := os.ReadFile(path)
 
 	if err != nil {
-		fmt.Println(Red, "\bError reading file:", err, Reset)
-		return
+		return err
 	}
 
 	if isContentBinary(content) {
@@ -137,7 +144,7 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 			fmt.Printf("%s is binary\n", path)
 		}
 
-		return
+		return nil
 	}
 
 	text := string(content)
@@ -148,7 +155,7 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 			fmt.Printf("%s has 0 matches\n", path)
 		}
 
-		return
+		return nil
 	}
 
 	textLength := len(text)
@@ -208,6 +215,8 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 
 		*matches = append(*matches, match)
 	}
+
+	return nil
 }
 
 func isContentBinary(data []byte) bool {
