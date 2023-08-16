@@ -16,6 +16,8 @@ type Configuration struct {
 	Pattern  *regexp.Regexp
 	DepthCap int
 	SizeCap  int64
+	CountCap int
+	MatchCap int
 }
 
 type Match struct {
@@ -38,10 +40,13 @@ func Rontgen(config *Configuration) []Match {
 		return matches
 	}
 
+	fileCount := 0
+
 	if isRootDir {
-		scanDir(config.Path, config, &matches, 0)
+		scanDir(config.Path, config, &matches, &fileCount, 0)
 	} else {
 		scanFile(config.Path, config, &matches)
+		fileCount = 1
 	}
 
 	return matches
@@ -55,7 +60,7 @@ func isDir(path string) (bool, error) {
 	return fileInfo.IsDir(), nil
 }
 
-func scanDir(path string, config *Configuration, matches *[]Match, depth int) {
+func scanDir(path string, config *Configuration, matches *[]Match, fileCount *int, depth int) {
 	if depth > config.DepthCap {
 		if config.Verbose {
 			fmt.Println(path, "reached depth cap of", config.DepthCap)
@@ -75,11 +80,20 @@ func scanDir(path string, config *Configuration, matches *[]Match, depth int) {
 		entryPath := filepath.Join(path, entry.Name())
 
 		if entry.IsDir() {
-			scanDir(entryPath, config, matches, depth+1)
+			scanDir(entryPath, config, matches, fileCount, depth+1)
 			continue
 		}
 
+		if *fileCount > config.CountCap {
+			if config.Verbose {
+				fmt.Println(path, "reached file cap of", config.CountCap)
+			}
+
+			return
+		}
+
 		scanFile(entryPath, config, matches)
+		*fileCount++
 	}
 }
 
@@ -148,7 +162,20 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 
 	rowCount := len(lineFeedIndices)
 
+	matchCount := 0
+
 	for _, location := range locations {
+		if matchCount > config.MatchCap {
+			if config.Verbose {
+				matchesRemaining := config.MatchCap - len(locations)
+				fmt.Println(path, "reached match cap of", config.DepthCap, "->", matchesRemaining, "matches remaining")
+			}
+
+			break
+		}
+
+		matchCount++
+
 		startIndex, endIndex := location[0], location[1]
 		matchLen := endIndex - startIndex
 
@@ -158,6 +185,7 @@ func scanFile(path string, config *Configuration, matches *[]Match) {
 		viewStart := lineIndex + 1 // + 1 to skip \n
 		if row == 0 {
 			viewStart = 0
+			column++ // one char to the right in first row
 		}
 
 		viewEnd := textLength

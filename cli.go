@@ -57,8 +57,13 @@ func main() {
 }
 
 func printMatchedLine(match Match) {
-	left := match.Line[0 : match.Column-1]
-	right := match.Line[match.Column+match.Length-1 : len(match.Line)]
+	col := match.Column - 1
+	if col < 0 {
+		col = 0
+	}
+
+	left := match.Line[0:col]
+	right := match.Line[col+match.Length : len(match.Line)]
 
 	PrintReset()
 	fmt.Print(left)
@@ -85,6 +90,8 @@ func handleFlags() (*Configuration, bool) {
 	versionFlag := flag.Bool("v", false, "Show version")
 	depthCapFlag := flag.Int("dc", 10, "Maximum directory depth")
 	sizeCapFlag := flag.Int64("fs", 20_000, "Maximum file size in kilobytes") // 20 MB by default
+	countCapFlag := flag.Int("fc", 100_000, "Maximum file count")
+	matchCapFlag := flag.Int("mc", 1_000, "Maximum matches per file")
 
 	flag.Parse()
 
@@ -93,9 +100,9 @@ func handleFlags() (*Configuration, bool) {
 		return nil, false
 	}
 
-	if *depthCapFlag <= 0 {
+	if *depthCapFlag < 0 {
 		fmt.Print(Red)
-		fmt.Print("Directory depth cap needs to be bigger than zero")
+		fmt.Print("Directory depth cap needs to be bigger or equal to zero")
 		fmt.Println(Reset)
 		return nil, true
 	}
@@ -103,6 +110,20 @@ func handleFlags() (*Configuration, bool) {
 	if *sizeCapFlag <= 0 {
 		fmt.Print(Red)
 		fmt.Print("File size cap needs to be bigger than zero")
+		fmt.Println(Reset)
+		return nil, true
+	}
+
+	if *countCapFlag <= 0 {
+		fmt.Print(Red)
+		fmt.Print("File count cap needs to be bigger than zero")
+		fmt.Println(Reset)
+		return nil, true
+	}
+
+	if *matchCapFlag <= 0 {
+		fmt.Print(Red)
+		fmt.Print("Match cap needs to be bigger than zero")
 		fmt.Println(Reset)
 		return nil, true
 	}
@@ -139,17 +160,19 @@ func handleFlags() (*Configuration, bool) {
 		Pattern:  pattern,
 		DepthCap: *depthCapFlag,
 		SizeCap:  *sizeCapFlag * 1_000, // converts KB to bytes
+		CountCap: *countCapFlag,
+		MatchCap: *matchCapFlag,
 	}
 
 	return &config, false
 }
 
 func printHelp() {
-	fmt.Printf("Usage: %s [-v] [-verbose] <path> <pattern>\n", os.Args[0])
+	fmt.Printf("Usage: %s [flags...] <pattern> <path>\n", os.Args[0])
 	fmt.Println("Flags:")
 	flag.PrintDefaults()
-	fmt.Println("  <path> Path to directory or file")
-	fmt.Println("  <pattern> Pattern to search for")
+	fmt.Println("  <pattern>\n  \tPattern to search for")
+	fmt.Println("  <path>\n  \tPath to directory or file")
 }
 
 func printVersion() {

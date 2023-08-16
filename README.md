@@ -7,15 +7,23 @@ Recursively find matches for a given regex pattern in file names or plain text f
 By default, Rontgen will search through the current working directory. You can specify a path of a file or directory.
 
 ```
-Usage: rn [-v] [-i] <pattern> <path>
+Usage: rn [flags...] <pattern> <path>
 Flags:
   -dc int
         Maximum directory depth (default 10)
+  -fc int
+        Maximum file count (default 100000)
+  -fs int
+        Maximum file size in kilobytes (default 20000)
+  -mc int
+        Maximum matches per file (default 1000)
   -v    Show version
   -verbose
         Verbose
-  <path> Path to directory or file
-  <pattern> Pattern to search for
+  <pattern>
+        Pattern to search for
+  <path>
+        Path to directory or file
 ```
 
 ## Installation
@@ -96,4 +104,4 @@ If a file name was matched the following fields will be set:
 - Make the ``Rontgen`` function also return errors (maybe with severity?)
 - Replace (example: rn <pattern> -r ...)
 - ~~Maximum directory depth, depth cap (-dc ...)~~
-- Max file count to search through, file cap (-fc ...)
+- ~~Max file count to search through, file cap (-fc ...)~~
