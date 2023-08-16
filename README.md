@@ -42,7 +42,7 @@ Otherwise you can build it yourself.
 
 ## Building it yourself
 
-To build the project yourself you need to have the Go language and Git installed on your device.
+To build the binary yourself you need to have Git and the Go language installed on your device.
 
 Run the following commands:
 ```zsh
@@ -52,10 +52,10 @@ git clone https://github.com/YONEDASH/Rontgen.git
 cd Rontgen
 ```
 ```zsh
-chmod +x build.sh && ./build.sh
+go build -o=rn
 ```
 
-Once you are done the binary called ``rn`` was created.
+Once you are done the binary called ``rn`` was created. Note that this binary won't have the current version number.
 
 ## API
 
@@ -106,7 +106,7 @@ If a file name was matched the following fields will be set:
 
 ## Todos
 
-- ~~Make the ``Rontgen`` function also return errors~~ (maybe with severity?)
 - Replace (example: rn <pattern> -r ...)
+- ~~Make the ``Rontgen`` function also return errors~~ (maybe with severity?)
 - ~~Maximum directory depth, depth cap (-dc ...)~~
 - ~~Max file count to search through, file cap (-fc ...)~~
