@@ -55,7 +55,7 @@ cd Rontgen
 go build -o=rn
 ```
 
-Once you are done the binary called ``rn`` was created. Note that this binary won't have the current version number.
+Once you are done the binary called ``rn`` was created. Note that this binary won't have the correct version number and will be labeled as a development version.
 
 ## API
 
