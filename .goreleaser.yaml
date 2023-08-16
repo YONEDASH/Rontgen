@@ -10,7 +10,7 @@ builds:
       - darwin
     binary: rn
     ldflags:
-      - -w -X "main.Version={{ .Version }}"
+      - -w -X "github.com/yonedash/rontgen/api.Version={{ .Version }}"
 
 archives:
   - name_template: >-
