@@ -1,4 +1,4 @@
-package rontgen
+package api
 
 import (
 	"fmt"
