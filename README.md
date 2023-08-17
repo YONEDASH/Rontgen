@@ -38,7 +38,7 @@ brew tap yonedash/homebrew-formulae
 brew install rontgen
 ```
 
-Otherwise you can build it yourself.
+Otherwise you can just [download the latest release here](https://github.com/YONEDASH/Rontgen/releases) or build it yourself.
 
 ## Building it yourself
 
